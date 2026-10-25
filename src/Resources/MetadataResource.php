@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Quikcast\Resources;
+
+use GuzzleHttp\ClientInterface;
+use Quikcast\Transport\SourceTransport;
+
+final class MetadataResource
+{
+    private readonly SourceTransport $transport;
+
+    public function __construct(?ClientInterface $http = null)
+    {
+        $this->transport = new SourceTransport($http);
+    }
+
+    /**
+     * Update the current song for a mount.
+     *
+     * This hits the streaming listener (not the management API) using the
+     * mount's source credentials via HTTP Basic auth.
+     */
+    public function updateSong(
+        string $listenBaseUrl,
+        string $mount,
+        string $sourceUser,
+        string $sourceSecret,
+        string $song,
+    ): void {
+        $this->transport->updateSong($listenBaseUrl, $mount, $sourceUser, $sourceSecret, $song);
+    }
+}

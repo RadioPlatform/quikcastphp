@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "id": "0123456789abcdef0123456789abcdef",
+      "mount": "/radio.mp3",
+      "generation": 7,
+      "connected_at": 1791460830000,
+      "duration_ms": 30000,
+      "connection": {"remote_address": "127.0.0.1:54210", "client_ip": "127.0.0.1", "user_agent": "Example player"},
+      "bytes_sent": 480000,
+      "icy_metadata": false,
+      "state": "connected"
+    }
+  ],
+  "next_after": "0123456789abcdef0123456789abcdef"
+}

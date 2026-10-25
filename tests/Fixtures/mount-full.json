@@ -1,0 +1,24 @@
+{
+  "path": "/radio.mp3",
+  "dynamic": false,
+  "fallback": "/backup.mp3",
+  "access": {"ip_allow_rules": 1, "ip_deny_rules": 2, "user_agent_allow_rules": 3, "user_agent_deny_rules": 4, "countries_allow": ["US"], "countries_deny": ["XX"]},
+  "source_access": {"ip_allow_rules": 5, "ip_deny_rules": 6},
+  "listener_auth": {"type": "signed_url", "max_ttl_seconds": 3600, "clock_skew_seconds": 5},
+  "source": {
+    "generation": 7, "connected_at": 1791460801000, "age_ms": 59000,
+    "connected_since": "2026-10-25T10:00:01Z", "generation_age_ms": 59000,
+    "ring": {"chunks": 4, "retained_bytes": 65536, "oldest_sequence": 10, "latest_sequence": 13},
+    "connection": {"remote_address": "127.0.0.1:53124", "client_ip": "127.0.0.1", "user_agent": null},
+    "content_type": "audio/mpeg", "format": "mp3", "codec": "mp3",
+    "source_metadata": {"name": null, "description": null, "genre": null, "url": null, "public": null, "declared_bitrate_kbps": null, "declared_sample_rate_hz": null, "declared_channels": null},
+    "track": {"revision": 3, "title": "T"}, "bytes_received": 944000, "state": "streaming"
+  },
+  "active_listeners": 1, "listener_limit": null, "effective_listener_limit": 128, "remaining_listener_capacity": 127,
+  "source_generations_started_total": 7, "listeners_accepted_total": 12, "listeners_accepted_current_generation": 2,
+  "last_source_disconnect_reason": "administrative_disconnect",
+  "source_disconnects_total": {"administrative_disconnect": 1}, "listener_disconnects_total": {"client_closed": 4},
+  "slow_consumer_disconnects_total": 1,
+  "relay": null,
+  "bytes_ingested": 944000, "bytes_served": 480000, "state": "accepting"
+}

@@ -1,0 +1,9 @@
+{
+  "path": "/radio.mp3",
+  "source": null,
+  "active_listeners": 0,
+  "listener_limit": null,
+  "bytes_ingested": 0,
+  "bytes_served": 0,
+  "state": "accepting"
+}

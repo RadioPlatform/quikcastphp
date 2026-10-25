@@ -1,0 +1,10 @@
+{
+  "mount": null,
+  "window_minutes": 60,
+  "retention_minutes": 1440,
+  "peak_listeners_24h": 41,
+  "listener_starts_24h": 318,
+  "unique_listeners_estimate_24h": 207,
+  "minutes": [{"start_ms": 1790000000000, "peak_listeners": 12, "listener_starts": 3}],
+  "hours": [{"start_ms": 1789999200000, "unique_listeners_estimate": 88}]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Quikcast",
+  "version": "0.1.0",
+  "started_at": 1791460800000,
+  "uptime_ms": 60000,
+  "config_generation": 1,
+  "config_committed_at": 1791460800000,
+  "state": "accepting",
+  "drain_started_at": null,
+  "drain_age_ms": null,
+  "capabilities": ["mp3", "management", "continuous-relays"],
+  "limits": {"max_connections": 256, "max_listeners": 128, "max_handshakes": 32}
+}

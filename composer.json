@@ -1,0 +1,38 @@
+{
+    "name": "quikcast/quikcast-php",
+    "description": "PHP client library for the Quikcast native management API.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["quikcast", "streaming", "icecast", "management-api", "guzzle"],
+    "require": {
+        "php": "^8.2",
+        "guzzlehttp/guzzle": "^7.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0",
+        "laravel/pint": "^1.0",
+        "phpstan/phpstan": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Quikcast\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Quikcast\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --colors=always",
+        "lint": "pint --test",
+        "lint:fix": "pint",
+        "stan": "phpstan analyse --no-progress",
+        "validate": "composer validate --strict"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {}
+    },
+    "minimum-stability": "stable"
+}

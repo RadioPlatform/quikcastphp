@@ -1,0 +1,25 @@
+{
+  "path": "/radio.mp3",
+  "source": {
+    "generation": 7,
+    "connected_at": 1791460801000,
+    "age_ms": 59000,
+    "connection": {"remote_address": "127.0.0.1:53124", "client_ip": "127.0.0.1", "user_agent": "Example encoder"},
+    "content_type": "audio/mpeg",
+    "format": "mp3",
+    "codec": "mp3",
+    "source_metadata": {
+      "name": "Example Radio", "description": "Live music", "genre": "Various",
+      "url": "https://radio.example.com", "public": false,
+      "declared_bitrate_kbps": 128, "declared_sample_rate_hz": 44100, "declared_channels": 2
+    },
+    "track": {"revision": 3, "title": "Example Artist - Example Track"},
+    "bytes_received": 944000,
+    "state": "streaming"
+  },
+  "active_listeners": 1,
+  "listener_limit": 64,
+  "bytes_ingested": 944000,
+  "bytes_served": 480000,
+  "state": "accepting"
+}
