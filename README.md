@@ -3,7 +3,7 @@
 PHP client library for the [Quikcast](https://quikcast.example.com) native management API, built on [Guzzle](https://docs.guzzlephp.org/).
 
 - Typed readonly DTOs (`ServerInfo`, `MountInfo`, `SourceInfo`, `ListenerInfo`, `StreamInfo`, `RenditionInfo`, `RelaySnapshot`, `Stats`, …) and enums for lifecycle states and error codes.
-- One resource per API group: `server()`, `stats()`, `mounts()`, `sources()`, `listeners()`, `hls()`, `relays()`, `history()`, plus `metadata()` (source operation) and `health()`.
+- One resource per API group: `server()`, `stats()`, `mounts()`, `sources()`, `listeners()`, `hls()`, `relays()`, `history()`, `metrics()`, plus `metadata()` (source operation) and `health()`.
 - Typed exceptions per API error code; secrets are never logged or exposed.
 
 Requires PHP `^8.2` and `guzzlehttp/guzzle` `^7.8`.
@@ -123,7 +123,7 @@ $drained = $client->server()->drain(); // one-way until restart; idempotent
 
 ### Metadata updates (source operation — different credentials!)
 
-`GET /api/metadata?mount=…&mode=updinfo&song=…` is **not** a management endpoint:
+`GET /api/metadata?mount=…&mode=updinfo&song=…` (or `artist=`/`title=`) is **not** a management endpoint:
 it runs on the streaming listener, uses the mount's **source credentials** via
 HTTP Basic auth, and returns ICY XML. Pass the listen URL, not the admin URL:
 
@@ -135,6 +135,18 @@ $client->metadata()->updateSong(
     $sourceSecret,            // mount source secret
     'Artist - Title',
 );
+```
+
+To set artist and title separately:
+
+```php
+$client->metadata()->updateTrack('http://127.0.0.1:8000', '/radio.mp3', 'source', $sourceSecret, 'Title', 'Artist');
+```
+
+### Prometheus metrics (no auth, admin listener)
+
+```php
+$text = $client->metrics()->text();
 ```
 
 ### Health probes (no auth)

@@ -16,6 +16,7 @@ use Quikcast\Enum\ServerState;
 use Quikcast\Exception\ListenerNotFoundException;
 use Quikcast\Exception\MountNotFoundException;
 use Quikcast\QuikcastClient;
+use Quikcast\Resources\MetricsResource;
 
 final class ResourcesTest extends TestCase
 {
@@ -247,5 +248,15 @@ final class ResourcesTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $this->client([])->history()->get(null, 1441);
+    }
+
+    public function test_metrics_returns_prometheus_text(): void
+    {
+        $mock = new MockHandler([new Response(200, [], "# TYPE ready gauge\nready 1\n")]);
+        $http = new Client(['handler' => HandlerStack::create($mock), 'http_errors' => false]);
+
+        $text = (new MetricsResource('http://127.0.0.1:9090/', $http))->text();
+
+        $this->assertStringContainsString('ready 1', $text);
     }
 }

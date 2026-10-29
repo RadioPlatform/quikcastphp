@@ -31,4 +31,18 @@ final class MetadataResource
     ): void {
         $this->transport->updateSong($listenBaseUrl, $mount, $sourceUser, $sourceSecret, $song);
     }
+
+    /**
+     * Update the track from separate artist and title fields.
+     */
+    public function updateTrack(
+        string $listenBaseUrl,
+        string $mount,
+        string $sourceUser,
+        string $sourceSecret,
+        string $title,
+        ?string $artist = null,
+    ): void {
+        $this->transport->updateTrack($listenBaseUrl, $mount, $sourceUser, $sourceSecret, $title, $artist);
+    }
 }

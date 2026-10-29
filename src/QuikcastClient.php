@@ -10,6 +10,7 @@ use Quikcast\Resources\HistoryResource;
 use Quikcast\Resources\HlsResource;
 use Quikcast\Resources\ListenersResource;
 use Quikcast\Resources\MetadataResource;
+use Quikcast\Resources\MetricsResource;
 use Quikcast\Resources\MountsResource;
 use Quikcast\Resources\RelaysResource;
 use Quikcast\Resources\ServerResource;
@@ -40,6 +41,8 @@ final class QuikcastClient
     private ?HealthResource $health = null;
 
     private ?HistoryResource $history = null;
+
+    private ?MetricsResource $metrics = null;
 
     public function __construct(
         private readonly Config $config,
@@ -87,6 +90,11 @@ final class QuikcastClient
     public function relays(): RelaysResource
     {
         return $this->relays ??= new RelaysResource($this->transport);
+    }
+
+    public function metrics(): MetricsResource
+    {
+        return $this->metrics ??= new MetricsResource($this->config->baseUrl());
     }
 
     public function history(): HistoryResource

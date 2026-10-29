@@ -35,14 +35,45 @@ final class SourceTransport
         string $sourceSecret,
         string $song,
     ): void {
+        $this->update($listenBaseUrl, $mount, $sourceUser, $sourceSecret, ['song' => $song]);
+    }
+
+    /**
+     * Update the track using separate artist and title fields ("artist - title").
+     */
+    public function updateTrack(
+        string $listenBaseUrl,
+        string $mount,
+        string $sourceUser,
+        string $sourceSecret,
+        string $title,
+        ?string $artist = null,
+    ): void {
+        $fields = ['title' => $title];
+        if ($artist !== null) {
+            $fields['artist'] = $artist;
+        }
+
+        $this->update($listenBaseUrl, $mount, $sourceUser, $sourceSecret, $fields);
+    }
+
+    /**
+     * @param  array<string, string>  $fields
+     */
+    private function update(
+        string $listenBaseUrl,
+        string $mount,
+        string $sourceUser,
+        string $sourceSecret,
+        array $fields,
+    ): void {
         $canonical = MountPath::canonicalize($mount);
-        $url = rtrim($listenBaseUrl, '/').$canonical
-            .'?'.http_build_query(
-                ['mode' => 'updinfo', 'song' => $song],
-                '',
-                '&',
-                PHP_QUERY_RFC3986
-            );
+        $url = rtrim($listenBaseUrl, '/').'/api/metadata?'.http_build_query(
+            ['mount' => $canonical, 'mode' => 'updinfo', 'charset' => 'UTF-8'] + $fields,
+            '',
+            '&',
+            PHP_QUERY_RFC3986
+        );
 
         try {
             $response = $this->http->request('GET', $url, [

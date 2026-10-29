@@ -66,10 +66,24 @@ final class SourceTransportTest extends TestCase
 
         $request = $this->lastRequest();
         $uri = (string) $request->getUri();
+        $this->assertSame('/api/metadata', $request->getUri()->getPath());
+        $this->assertStringContainsString('mount=%2Fradio.mp3', $uri);
         $this->assertStringContainsString('mode=updinfo', $uri);
-        $this->assertStringContainsString('song=', $uri);
+        $this->assertStringContainsString('song=Artist%20-%20Title', $uri);
         $this->assertStringStartsWith('Basic ', $request->getHeaderLine('Authorization'));
         $this->assertStringNotContainsString('Bearer', $request->getHeaderLine('Authorization'));
+    }
+
+    public function test_update_track_sends_artist_and_title(): void
+    {
+        $transport = $this->transport(new MockHandler([new Response(200)]));
+
+        $transport->updateTrack('http://127.0.0.1:8000', 'radio.mp3', 'source', 'secret', 'Title', 'Artist');
+
+        $query = $this->lastRequest()->getUri()->getQuery();
+        $this->assertStringContainsString('artist=Artist', $query);
+        $this->assertStringContainsString('title=Title', $query);
+        $this->assertStringNotContainsString('song=', $query);
     }
 
     public function test_update_song_401_maps_to_unauthorized(): void

@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   streaming listener.
 - Lightweight health probes (`/health/live`, `/health/ready`).
 - Typed readonly DTOs, enums, and per-error-code exception hierarchy.
+- Fixed source metadata updates to use `/api/metadata?mount=…` on the streaming listener;
+  added `updateTrack()` (artist/title) and a `metrics()` resource for `/metrics`.
 - `history()` resource for `GET /api/history` (server-wide or per mount, `minutes` window).
 - Full parity with current API fields: access/source-access/listener-auth policies,
   fallback and dynamic mounts, per-mount counters and disconnect reasons, embedded relay
