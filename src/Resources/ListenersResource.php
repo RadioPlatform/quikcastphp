@@ -10,9 +10,9 @@ use Quikcast\Dto\ListenerPage;
 use Quikcast\Support\MountPath;
 use Quikcast\Transport\ManagementTransport;
 
-final class ListenersResource
+final readonly class ListenersResource
 {
-    public function __construct(private readonly ManagementTransport $transport) {}
+    public function __construct(private ManagementTransport $transport) {}
 
     public function page(string $mount, int $limit = 100, ?string $after = null): ListenerPage
     {

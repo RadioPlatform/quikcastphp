@@ -7,9 +7,9 @@ namespace Quikcast\Resources;
 use Quikcast\Dto\ServerInfo;
 use Quikcast\Transport\ManagementTransport;
 
-final class ServerResource
+final readonly class ServerResource
 {
-    public function __construct(private readonly ManagementTransport $transport) {}
+    public function __construct(private ManagementTransport $transport) {}
 
     public function get(): ServerInfo
     {

@@ -7,9 +7,9 @@ namespace Quikcast\Resources;
 use GuzzleHttp\ClientInterface;
 use Quikcast\Transport\SourceTransport;
 
-final class MetadataResource
+final readonly class MetadataResource
 {
-    private readonly SourceTransport $transport;
+    private SourceTransport $transport;
 
     public function __construct(?ClientInterface $http = null)
     {

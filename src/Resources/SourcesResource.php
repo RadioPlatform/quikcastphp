@@ -8,9 +8,9 @@ use Quikcast\Dto\SourceInfo;
 use Quikcast\Support\MountPath;
 use Quikcast\Transport\ManagementTransport;
 
-final class SourcesResource
+final readonly class SourcesResource
 {
-    public function __construct(private readonly ManagementTransport $transport) {}
+    public function __construct(private ManagementTransport $transport) {}
 
     /**
      * Returns null when the mount exists but has no connected source

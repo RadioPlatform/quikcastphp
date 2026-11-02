@@ -8,9 +8,9 @@ use Quikcast\Dto\RenditionInfo;
 use Quikcast\Dto\StreamInfo;
 use Quikcast\Transport\ManagementTransport;
 
-final class HlsResource
+final readonly class HlsResource
 {
-    public function __construct(private readonly ManagementTransport $transport) {}
+    public function __construct(private ManagementTransport $transport) {}
 
     /**
      * @return list<StreamInfo>

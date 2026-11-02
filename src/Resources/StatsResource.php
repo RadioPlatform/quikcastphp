@@ -7,9 +7,9 @@ namespace Quikcast\Resources;
 use Quikcast\Dto\Stats;
 use Quikcast\Transport\ManagementTransport;
 
-final class StatsResource
+final readonly class StatsResource
 {
-    public function __construct(private readonly ManagementTransport $transport) {}
+    public function __construct(private ManagementTransport $transport) {}
 
     public function get(): Stats
     {

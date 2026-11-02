@@ -8,9 +8,9 @@ use Quikcast\Dto\MountInfo;
 use Quikcast\Support\MountPath;
 use Quikcast\Transport\ManagementTransport;
 
-final class MountsResource
+final readonly class MountsResource
 {
-    public function __construct(private readonly ManagementTransport $transport) {}
+    public function __construct(private ManagementTransport $transport) {}
 
     /**
      * @return list<MountInfo>

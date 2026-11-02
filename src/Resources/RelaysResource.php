@@ -8,9 +8,9 @@ use Quikcast\Dto\RelaySnapshot;
 use Quikcast\Support\MountPath;
 use Quikcast\Transport\ManagementTransport;
 
-final class RelaysResource
+final readonly class RelaysResource
 {
-    public function __construct(private readonly ManagementTransport $transport) {}
+    public function __construct(private ManagementTransport $transport) {}
 
     /**
      * @return list<RelaySnapshot>

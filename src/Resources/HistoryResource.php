@@ -18,7 +18,9 @@ final class HistoryResource
     /**
      * Volatile listener history for the whole server, or one mount when $mount is given.
      *
-     * @param  int  $minutes  per-minute window, 1–1440 (server default 60)
+     * @param string|null $mount
+     * @param int|null $minutes per-minute window, 1–1440 (server default 60)
+     * @return History
      */
     public function get(?string $mount = null, ?int $minutes = null): History
     {
