@@ -2,6 +2,7 @@
     "name": "quikcast/quikcast",
     "description": "PHP client library for the Quikcast native management API.",
     "type": "library",
+    "homepage": "https://quikcastdocs.streamafrica.net/",
     "license": "MIT",
     "keywords": ["quikcast", "streaming", "icecast", "management-api", "elliephp"],
     "require": {

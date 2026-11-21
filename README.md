@@ -1,12 +1,14 @@
 # quikcast/quikcast
 
-PHP client library for the [Quikcast](https://quikcast.example.com) native management API, built on [ElliePHP HttpClient](https://github.com/ElliePHP/HttpClient) (Symfony HttpClient).
+PHP client library for the [Quikcast](https://quikcastdocs.streamafrica.net/) native management API, built on [ElliePHP HttpClient](https://github.com/ElliePHP/HttpClient) (Symfony HttpClient).
 
 - Typed readonly DTOs (`ServerInfo`, `MountInfo`, `SourceInfo`, `ListenerInfo`, `StreamInfo`, `RenditionInfo`, `RelaySnapshot`, `Stats`, …) and enums for lifecycle states and error codes.
 - One resource per API group: `server()`, `stats()`, `mounts()`, `sources()`, `listeners()`, `hls()`, `relays()`, `history()`, `metrics()`, plus `metadata()` (source operation) and `health()`.
 - Typed exceptions per API error code; secrets are never logged or exposed.
 
 Requires PHP `^8.4` and `elliephp/httpclient` `^1.0`.
+
+Full documentation: <https://quikcastdocs.streamafrica.net/clients/php>.
 
 ## Install
 
