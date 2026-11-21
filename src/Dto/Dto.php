@@ -82,15 +82,10 @@ abstract readonly class Dto
      */
     protected static function intMap(array $data, string $key): array
     {
-        $out = [];
 
-        foreach (self::arr($data, $key) as $k => $v) {
-            if (is_int($v)) {
-                $out[$k] = $v;
-            }
-        }
-
-        return $out;
+        return array_filter(self::arr($data, $key), function ($v) {
+            return is_int($v);
+        });
     }
 
     /**
@@ -104,15 +99,9 @@ abstract readonly class Dto
             return [];
         }
 
-        $out = [];
-
-        foreach ($value as $k => $v) {
-            if (is_string($k)) {
-                $out[$k] = $v;
-            }
-        }
-
-        return $out;
+        return array_filter($value, function ($k) {
+            return is_string($k);
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
