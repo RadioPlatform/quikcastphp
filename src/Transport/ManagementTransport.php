@@ -40,7 +40,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ManagementTransport
 {
-    public const USER_AGENT = 'quikcast-php/0.1.0';
+    public const string USER_AGENT = 'quikcast-php/0.0.1';
 
     private HttpClient $http;
 
