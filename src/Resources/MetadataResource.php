@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Quikcast\Resources;
 
 use Quikcast\Transport\SourceTransport;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final readonly class MetadataResource
 {
     private SourceTransport $transport;
 
-    public function __construct(?HttpClientInterface $http = null)
+    public function __construct()
     {
-        $this->transport = new SourceTransport($http);
+        $this->transport = new SourceTransport;
     }
 
     /**

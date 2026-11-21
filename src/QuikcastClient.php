@@ -18,7 +18,6 @@ use Quikcast\Resources\ServerResource;
 use Quikcast\Resources\SourcesResource;
 use Quikcast\Resources\StatsResource;
 use Quikcast\Transport\ManagementTransport;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class QuikcastClient
 {
@@ -50,17 +49,19 @@ final class QuikcastClient
 
     private ?RevocationsResource $revocations = null;
 
+    /**
+     * @param  ManagementTransport|null  $transport  @internal replaces the default transport (used by tests)
+     */
     public function __construct(
         private readonly Config $config,
-        ?HttpClientInterface $http = null,
-        private readonly ?HttpClientInterface $sourceHttp = null,
+        ?ManagementTransport $transport = null,
     ) {
-        $this->transport = new ManagementTransport($config, $http);
+        $this->transport = $transport ?? new ManagementTransport($config);
     }
 
-    public static function create(string $baseUrl, string $token, ?HttpClientInterface $http = null): self
+    public static function create(string $baseUrl, string $token): self
     {
-        return new self(new Config($baseUrl, $token), $http);
+        return new self(new Config($baseUrl, $token));
     }
 
     public function server(): ServerResource
@@ -120,7 +121,7 @@ final class QuikcastClient
 
     public function metadata(): MetadataResource
     {
-        return $this->metadata ??= new MetadataResource($this->sourceHttp);
+        return $this->metadata ??= new MetadataResource;
     }
 
     public function health(): HealthResource

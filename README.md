@@ -225,19 +225,6 @@ Pass canonical (`/radio.mp3`) or bare (`radio.mp3`, `nested/radio.mp3`) paths â€
 the client normalizes to one leading slash and URL-encodes each segment, so
 nested mounts never collide with reserved suffixes.
 
-## Injecting your own HTTP client
-
-Pass any Symfony `HttpClientInterface` (for example a scoped client with a
-timeout, or `MockHttpClient` in tests):
-
-```php
-use Symfony\Component\HttpClient\HttpClient;
-
-$client = QuikcastClient::create($baseUrl, $token, HttpClient::create([
-    'timeout' => 5.0,
-]));
-```
-
 ## Development
 
 ```sh

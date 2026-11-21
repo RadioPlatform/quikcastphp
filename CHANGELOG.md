@@ -16,9 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `BanNotFound`, `BanListFull`, `RevocationNotFound` and `RevocationListFull` exceptions.
 
 ### Changed
-- **Breaking:** replaced Guzzle with [ElliePHP HttpClient](https://github.com/ElliePHP/HttpClient).
-  Custom clients passed to `QuikcastClient` must now implement Symfony's
-  `HttpClientInterface` instead of Guzzle's `ClientInterface`.
+- Replaced Guzzle with [ElliePHP HttpClient](https://github.com/ElliePHP/HttpClient).
+  `QuikcastClient` no longer accepts a custom HTTP client.
 - **Breaking:** requires PHP `^8.4` (was `^8.2`).
 - Updated dev tooling: PHPUnit 13, Pint 1.32, PHPStan 2.3.
 

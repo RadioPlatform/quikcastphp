@@ -6,6 +6,7 @@ namespace Quikcast\Tests\Feature;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Quikcast\Config;
 use Quikcast\Dto\Stats;
 use Quikcast\Enum\HlsState;
 use Quikcast\Enum\ServerState;
@@ -17,6 +18,7 @@ use Quikcast\Exception\RevocationNotFoundException;
 use Quikcast\QuikcastClient;
 use Quikcast\Resources\MetricsResource;
 use Quikcast\Tests\Support\FakeHttp;
+use Quikcast\Transport\ManagementTransport;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 final class ResourcesTest extends TestCase
@@ -28,7 +30,9 @@ final class ResourcesTest extends TestCase
     {
         $this->http = new FakeHttp($responses);
 
-        return QuikcastClient::create('http://127.0.0.1:9090', 'test-token', $this->http->client);
+        $config = new Config('http://127.0.0.1:9090', 'test-token');
+
+        return new QuikcastClient($config, new ManagementTransport($config, $this->http->client));
     }
 
     private function fixtureBody(string $name): string
