@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3352039bbc9f6c7a3c7a2b6a138a0875",
+    "content-hash": "50fe76bbbf590e264d0606b4878aedd7",
     "packages": [
         {
             "name": "elliephp/httpclient",

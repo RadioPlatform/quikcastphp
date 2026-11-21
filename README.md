@@ -1,4 +1,4 @@
-# quikcast-php
+# quikcast/quikcast
 
 PHP client library for the [Quikcast](https://quikcast.example.com) native management API, built on [ElliePHP HttpClient](https://github.com/ElliePHP/HttpClient) (Symfony HttpClient).
 
@@ -11,7 +11,7 @@ Requires PHP `^8.4` and `elliephp/httpclient` `^1.0`.
 ## Install
 
 ```sh
-composer require quikcast/quikcast-php
+composer require quikcast/quikcast
 ```
 
 ## Quick start
