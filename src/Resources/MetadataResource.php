@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Quikcast\Resources;
 
-use GuzzleHttp\ClientInterface;
 use Quikcast\Transport\SourceTransport;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final readonly class MetadataResource
 {
     private SourceTransport $transport;
 
-    public function __construct(?ClientInterface $http = null)
+    public function __construct(?HttpClientInterface $http = null)
     {
         $this->transport = new SourceTransport($http);
     }

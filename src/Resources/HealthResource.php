@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Quikcast\Resources;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
+use ElliePHP\Components\HttpClient\HttpClient;
+use ElliePHP\Components\HttpClient\RequestException;
 use Quikcast\Exception\TransportException;
 use Quikcast\Transport\ManagementTransport;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class HealthResource
 {
-    private ClientInterface $http;
+    private HttpClient $http;
 
     public function __construct(
         private readonly string $baseUrl,
-        ?ClientInterface $http = null,
+        ?HttpClientInterface $http = null,
     ) {
-        $this->http = $http ?? new Client(['http_errors' => false]);
+        $this->http = new HttpClient($http);
     }
 
     public function live(): bool
@@ -34,15 +34,13 @@ final class HealthResource
     private function probe(string $path): bool
     {
         try {
-            $response = $this->http->request('GET', rtrim($this->baseUrl, '/').$path, [
-                'http_errors' => false,
-                'headers' => ['User-Agent' => ManagementTransport::USER_AGENT],
-            ]);
-        } catch (GuzzleException $e) {
+            $status = $this->http
+                ->withUserAgent(ManagementTransport::USER_AGENT)
+                ->get(rtrim($this->baseUrl, '/').$path)
+                ->status();
+        } catch (RequestException $e) {
             throw new TransportException('HTTP transport failure: '.$e->getMessage(), 0, $e);
         }
-
-        $status = $response->getStatusCode();
 
         if ($status === 200) {
             return true;

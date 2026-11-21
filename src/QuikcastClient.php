@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Quikcast;
 
-use GuzzleHttp\ClientInterface;
+use Quikcast\Resources\BansResource;
 use Quikcast\Resources\HealthResource;
 use Quikcast\Resources\HistoryResource;
 use Quikcast\Resources\HlsResource;
@@ -13,10 +13,12 @@ use Quikcast\Resources\MetadataResource;
 use Quikcast\Resources\MetricsResource;
 use Quikcast\Resources\MountsResource;
 use Quikcast\Resources\RelaysResource;
+use Quikcast\Resources\RevocationsResource;
 use Quikcast\Resources\ServerResource;
 use Quikcast\Resources\SourcesResource;
 use Quikcast\Resources\StatsResource;
 use Quikcast\Transport\ManagementTransport;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class QuikcastClient
 {
@@ -44,15 +46,19 @@ final class QuikcastClient
 
     private ?MetricsResource $metrics = null;
 
+    private ?BansResource $bans = null;
+
+    private ?RevocationsResource $revocations = null;
+
     public function __construct(
         private readonly Config $config,
-        ?ClientInterface $http = null,
-        private readonly ?ClientInterface $sourceHttp = null,
+        ?HttpClientInterface $http = null,
+        private readonly ?HttpClientInterface $sourceHttp = null,
     ) {
         $this->transport = new ManagementTransport($config, $http);
     }
 
-    public static function create(string $baseUrl, string $token, ?ClientInterface $http = null): self
+    public static function create(string $baseUrl, string $token, ?HttpClientInterface $http = null): self
     {
         return new self(new Config($baseUrl, $token), $http);
     }
@@ -95,6 +101,16 @@ final class QuikcastClient
     public function metrics(): MetricsResource
     {
         return $this->metrics ??= new MetricsResource($this->config->baseUrl());
+    }
+
+    public function bans(): BansResource
+    {
+        return $this->bans ??= new BansResource($this->transport);
+    }
+
+    public function revocations(): RevocationsResource
+    {
+        return $this->revocations ??= new RevocationsResource($this->transport);
     }
 
     public function history(): HistoryResource

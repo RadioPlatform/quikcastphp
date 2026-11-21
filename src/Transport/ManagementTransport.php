@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Quikcast\Transport;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
+use ElliePHP\Components\HttpClient\HttpClient;
+use ElliePHP\Components\HttpClient\RequestException;
+use InvalidArgumentException;
 use JsonException;
 use Quikcast\Config;
 use Quikcast\Dto\ErrorResponse;
 use Quikcast\Enum\ErrorCode;
+use Quikcast\Exception\BanListFullException;
+use Quikcast\Exception\BanNotFoundException;
 use Quikcast\Exception\ConflictException;
 use Quikcast\Exception\EndpointNotFoundException;
 use Quikcast\Exception\HlsNotFoundException;
@@ -22,13 +24,16 @@ use Quikcast\Exception\MethodNotAllowedException;
 use Quikcast\Exception\MountNotFoundException;
 use Quikcast\Exception\QuikcastException;
 use Quikcast\Exception\RelayNotFoundException;
+use Quikcast\Exception\RevocationListFullException;
+use Quikcast\Exception\RevocationNotFoundException;
 use Quikcast\Exception\ServerDrainingException;
 use Quikcast\Exception\SourceNotConnectedException;
 use Quikcast\Exception\TransportException;
 use Quikcast\Exception\UnauthorizedException;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * Guzzle wrapper for the Bearer-authenticated management API.
+ * ElliePHP HttpClient wrapper for the Bearer-authenticated management API.
  *
  * All management requests carry no body; POST/DELETE explicitly send
  * Content-Length: 0 and never use chunked encoding or Expect.
@@ -37,13 +42,13 @@ final class ManagementTransport
 {
     public const USER_AGENT = 'quikcast-php/0.1.0';
 
-    private ClientInterface $http;
+    private HttpClient $http;
 
     public function __construct(
         private readonly Config $config,
-        ?ClientInterface $http = null,
+        ?HttpClientInterface $http = null,
     ) {
-        $this->http = $http ?? new Client(['http_errors' => false]);
+        $this->http = new HttpClient($http);
     }
 
     /**
@@ -58,33 +63,29 @@ final class ManagementTransport
             $url .= '?'.http_build_query($query, '', '&', PHP_QUERY_RFC3986);
         }
 
-        $options = [
-            'http_errors' => false,
-            'headers' => [
-                'Authorization' => 'Bearer '.$this->config->token,
-                'Accept' => 'application/json',
-                'User-Agent' => self::USER_AGENT,
-            ],
-        ];
-
-        if ($method === 'POST' || $method === 'DELETE') {
-            $options['headers']['Content-Length'] = '0';
-            $options['body'] = '';
-        }
+        $request = $this->http
+            ->withToken($this->config->token)
+            ->acceptJson()
+            ->withUserAgent(self::USER_AGENT);
 
         try {
-            $response = $this->http->request($method, $url, $options);
-        } catch (GuzzleException $e) {
+            $response = match ($method) {
+                'GET' => $request->get($url),
+                'POST' => $request->withHeader('Content-Length', '0')->post($url),
+                'DELETE' => $request->withHeader('Content-Length', '0')->delete($url),
+                default => throw new InvalidArgumentException('Unsupported HTTP method: '.$method),
+            };
+
+            $status = $response->status();
+            $body = $response->body();
+            $allow = $response->header('Allow');
+        } catch (RequestException $e) {
             throw new TransportException('HTTP transport failure: '.$e->getMessage(), 0, $e);
         }
-
-        $status = $response->getStatusCode();
 
         if ($status === 204) {
             return null;
         }
-
-        $body = (string) $response->getBody();
 
         if ($status >= 200 && $status < 300) {
             if ($body === '') {
@@ -97,8 +98,6 @@ final class ManagementTransport
                 throw new TransportException('Invalid JSON response from Quikcast: '.$e->getMessage(), 0, $e);
             }
         }
-
-        $allow = $response->hasHeader('Allow') ? implode(', ', $response->getHeader('Allow')) : null;
 
         $decoded = null;
         if ($body !== '') {
@@ -131,6 +130,10 @@ final class ManagementTransport
             ErrorCode::ServerDraining => new ServerDrainingException($message, $status, $error->code, $allow),
             ErrorCode::MethodNotAllowed => new MethodNotAllowedException($message, $status, $error->code, $allow),
             ErrorCode::EndpointNotFound => new EndpointNotFoundException($message, $status, $error->code, $allow),
+            ErrorCode::BanNotFound => new BanNotFoundException($message, $status, $error->code, $allow),
+            ErrorCode::BanListFull => new BanListFullException($message, $status, $error->code, $allow),
+            ErrorCode::RevocationNotFound => new RevocationNotFoundException($message, $status, $error->code, $allow),
+            ErrorCode::RevocationListFull => new RevocationListFullException($message, $status, $error->code, $allow),
             ErrorCode::InternalError => new InternalErrorException($message, $status, $error->code, $allow),
             default => match (true) {
                 $status === 401 => new UnauthorizedException($message, $status, $error->code, $allow),

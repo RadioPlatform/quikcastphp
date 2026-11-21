@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Quikcast\Transport;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
+use ElliePHP\Components\HttpClient\HttpClient;
+use ElliePHP\Components\HttpClient\RequestException;
 use Quikcast\Enum\ErrorCode;
 use Quikcast\Exception\TransportException;
 use Quikcast\Exception\UnauthorizedException;
 use Quikcast\Support\MountPath;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Transport for the source metadata operation.
@@ -21,11 +21,11 @@ use Quikcast\Support\MountPath;
  */
 final class SourceTransport
 {
-    private ClientInterface $http;
+    private HttpClient $http;
 
-    public function __construct(?ClientInterface $http = null)
+    public function __construct(?HttpClientInterface $http = null)
     {
-        $this->http = $http ?? new Client(['http_errors' => false]);
+        $this->http = new HttpClient($http);
     }
 
     public function updateSong(
@@ -76,16 +76,14 @@ final class SourceTransport
         );
 
         try {
-            $response = $this->http->request('GET', $url, [
-                'http_errors' => false,
-                'auth' => [$sourceUser, $sourceSecret],
-                'headers' => ['User-Agent' => ManagementTransport::USER_AGENT],
-            ]);
-        } catch (GuzzleException $e) {
+            $status = $this->http
+                ->withBasicAuth($sourceUser, $sourceSecret)
+                ->withUserAgent(ManagementTransport::USER_AGENT)
+                ->get($url)
+                ->status();
+        } catch (RequestException $e) {
             throw new TransportException('HTTP transport failure: '.$e->getMessage(), 0, $e);
         }
-
-        $status = $response->getStatusCode();
 
         if ($status === 401) {
             throw new UnauthorizedException('Source authentication failed', 401, ErrorCode::Unauthorized);

@@ -1,12 +1,12 @@
 # quikcast-php
 
-PHP client library for the [Quikcast](https://quikcast.example.com) native management API, built on [Guzzle](https://docs.guzzlephp.org/).
+PHP client library for the [Quikcast](https://quikcast.example.com) native management API, built on [ElliePHP HttpClient](https://github.com/ElliePHP/HttpClient) (Symfony HttpClient).
 
 - Typed readonly DTOs (`ServerInfo`, `MountInfo`, `SourceInfo`, `ListenerInfo`, `StreamInfo`, `RenditionInfo`, `RelaySnapshot`, `Stats`, â€¦) and enums for lifecycle states and error codes.
 - One resource per API group: `server()`, `stats()`, `mounts()`, `sources()`, `listeners()`, `hls()`, `relays()`, `history()`, `metrics()`, plus `metadata()` (source operation) and `health()`.
 - Typed exceptions per API error code; secrets are never logged or exposed.
 
-Requires PHP `^8.2` and `guzzlehttp/guzzle` `^7.8`.
+Requires PHP `^8.4` and `elliephp/httpclient` `^1.0`.
 
 ## Install
 
@@ -93,6 +93,27 @@ foreach ($client->hls()->listStreams() as $stream) {
 }
 ```
 
+Directory streams (`$stream->isDirectory()`) carry listener and request counters, and their
+sessions are listed with `$client->hls()->listeners('radio')`.
+
+### Listener bans and link revocation
+
+Both are held in memory on the server (lost on restart, not shared between replicas).
+
+```php
+$result = $client->bans()->create('203.0.113.0/24', ttlSeconds: 86400, reason: 'scraper', kick: true);
+echo $result->kickedListeners;
+
+foreach ($client->bans()->list() as $ban) {
+    echo $ban->ip.' '.$ban->expiresInSeconds.PHP_EOL;
+}
+$client->bans()->lift('203.0.113.0/24'); // use the same text it was created with
+
+// Stop one signed link before it expires (sig and expires come from the link itself).
+$client->revocations()->revoke($sig, $expires);
+$client->revocations()->restore($sig);
+```
+
 ### Listener history
 
 ```php
@@ -170,10 +191,14 @@ API errors use the `{error: {code, message}}` envelope and map to typed exceptio
 | 404 | `listener_not_found` | `ListenerNotFoundException` |
 | 404 | `hls_not_found` | `HlsNotFoundException` |
 | 404 | `relay_not_found` | `RelayNotFoundException` |
+| 404 | `ban_not_found` | `BanNotFoundException` |
+| 404 | `revocation_not_found` | `RevocationNotFoundException` |
 | 404 | `endpoint_not_found` | `EndpointNotFoundException` |
 | 405 | `method_not_allowed` | `MethodNotAllowedException` (`->allow` header) |
 | 409 | `source_not_connected` | `SourceNotConnectedException` |
 | 409 | `conflict` | `ConflictException` (stale generation/revision) |
+| 507 | `ban_list_full` | `BanListFullException` |
+| 507 | `revocation_list_full` | `RevocationListFullException` |
 | 503 | `server_draining` | `ServerDrainingException` |
 | 500 | `internal_error` | `InternalErrorException` |
 
@@ -200,12 +225,15 @@ Pass canonical (`/radio.mp3`) or bare (`radio.mp3`, `nested/radio.mp3`) paths â€
 the client normalizes to one leading slash and URL-encodes each segment, so
 nested mounts never collide with reserved suffixes.
 
-## Injecting your own Guzzle client
+## Injecting your own HTTP client
+
+Pass any Symfony `HttpClientInterface` (for example a scoped client with a
+timeout, or `MockHttpClient` in tests):
 
 ```php
-use GuzzleHttp\Client;
+use Symfony\Component\HttpClient\HttpClient;
 
-$client = QuikcastClient::create($baseUrl, $token, new Client([
+$client = QuikcastClient::create($baseUrl, $token, HttpClient::create([
     'timeout' => 5.0,
 ]));
 ```

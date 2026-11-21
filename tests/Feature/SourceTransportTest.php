@@ -4,83 +4,48 @@ declare(strict_types=1);
 
 namespace Quikcast\Tests\Feature;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\RequestInterface;
 use Quikcast\Exception\TransportException;
 use Quikcast\Exception\UnauthorizedException;
+use Quikcast\Tests\Support\FakeHttp;
 use Quikcast\Transport\SourceTransport;
 
 final class SourceTransportTest extends TestCase
 {
-    /** @var list<RequestInterface> */
-    private array $recorded = [];
+    private FakeHttp $http;
 
-    private function transport(MockHandler $mock): SourceTransport
+    private function transport(FakeHttp $http): SourceTransport
     {
-        $stack = HandlerStack::create($mock);
-        $stack->push($this->recorder());
+        $this->http = $http;
 
-        return new SourceTransport(new Client(['handler' => $stack, 'http_errors' => false]));
-    }
-
-    private function recorder(): callable
-    {
-        return function (callable $handler): callable {
-            return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
-                $this->recorded[] = $request;
-
-                $promise = $handler($request, $options);
-
-                if (! $promise instanceof PromiseInterface) {
-                    self::fail('Handler did not return a promise');
-                }
-
-                return $promise;
-            };
-        };
-    }
-
-    private function lastRequest(int $index = 0): RequestInterface
-    {
-        $request = $this->recorded[$index] ?? null;
-
-        if (! $request instanceof RequestInterface) {
-            self::fail('No recorded request at index '.$index);
-        }
-
-        return $request;
+        return new SourceTransport($http->client);
     }
 
     public function test_update_song_uses_basic_auth_and_query(): void
     {
-        $transport = $this->transport(new MockHandler([
-            new Response(200, ['Content-Type' => 'text/xml'], '<iceresponse><message>OK</message></iceresponse>'),
+        $transport = $this->transport(new FakeHttp([
+            FakeHttp::response(200, ['Content-Type' => 'text/xml'], '<iceresponse><message>OK</message></iceresponse>'),
         ]));
 
         $transport->updateSong('http://127.0.0.1:8000', '/radio.mp3', 'source', 'secret', 'Artist - Title');
 
-        $request = $this->lastRequest();
-        $uri = (string) $request->getUri();
-        $this->assertSame('/api/metadata', $request->getUri()->getPath());
+        $request = $this->http->last();
+        $uri = $request->url;
+        $this->assertSame('/api/metadata', $request->path());
         $this->assertStringContainsString('mount=%2Fradio.mp3', $uri);
         $this->assertStringContainsString('mode=updinfo', $uri);
         $this->assertStringContainsString('song=Artist%20-%20Title', $uri);
-        $this->assertStringStartsWith('Basic ', $request->getHeaderLine('Authorization'));
-        $this->assertStringNotContainsString('Bearer', $request->getHeaderLine('Authorization'));
+        $this->assertStringStartsWith('Basic ', $request->header('Authorization'));
+        $this->assertStringNotContainsString('Bearer', $request->header('Authorization'));
     }
 
     public function test_update_track_sends_artist_and_title(): void
     {
-        $transport = $this->transport(new MockHandler([new Response(200)]));
+        $transport = $this->transport(new FakeHttp([FakeHttp::response(200)]));
 
         $transport->updateTrack('http://127.0.0.1:8000', 'radio.mp3', 'source', 'secret', 'Title', 'Artist');
 
-        $query = $this->lastRequest()->getUri()->getQuery();
+        $query = $this->http->last()->query();
         $this->assertStringContainsString('artist=Artist', $query);
         $this->assertStringContainsString('title=Title', $query);
         $this->assertStringNotContainsString('song=', $query);
@@ -88,7 +53,7 @@ final class SourceTransportTest extends TestCase
 
     public function test_update_song_401_maps_to_unauthorized(): void
     {
-        $transport = $this->transport(new MockHandler([new Response(401)]));
+        $transport = $this->transport(new FakeHttp([FakeHttp::response(401)]));
 
         $this->expectException(UnauthorizedException::class);
         $transport->updateSong('http://127.0.0.1:8000', '/radio.mp3', 'source', 'wrong', 'Artist - Title');
@@ -96,7 +61,7 @@ final class SourceTransportTest extends TestCase
 
     public function test_update_song_500_maps_to_transport(): void
     {
-        $transport = $this->transport(new MockHandler([new Response(500)]));
+        $transport = $this->transport(new FakeHttp([FakeHttp::response(500)]));
 
         $this->expectException(TransportException::class);
         $transport->updateSong('http://127.0.0.1:8000', '/radio.mp3', 'source', 'secret', 'Artist - Title');

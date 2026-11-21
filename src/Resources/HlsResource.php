@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Quikcast\Resources;
 
+use Quikcast\Dto\HlsSession;
 use Quikcast\Dto\RenditionInfo;
 use Quikcast\Dto\StreamInfo;
 use Quikcast\Transport\ManagementTransport;
@@ -29,6 +30,19 @@ final readonly class HlsResource
         $data = $this->transport->request('GET', '/api/hls/'.rawurlencode($stream));
 
         return StreamInfo::fromArray($data);
+    }
+
+    /**
+     * Active listener sessions of a directory stream, most recently active first.
+     *
+     * @return list<HlsSession>
+     */
+    public function listeners(string $stream): array
+    {
+        /** @var list<array<string, mixed>> $data */
+        $data = $this->transport->request('GET', '/api/hls/'.rawurlencode($stream).'/listeners');
+
+        return array_map(HlsSession::fromArray(...), $data);
     }
 
     /**

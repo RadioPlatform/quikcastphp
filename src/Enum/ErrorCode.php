@@ -18,6 +18,10 @@ enum ErrorCode: string
     case SourceNotConnected = 'source_not_connected';
     case Conflict = 'conflict';
     case ServerDraining = 'server_draining';
+    case BanNotFound = 'ban_not_found';
+    case BanListFull = 'ban_list_full';
+    case RevocationNotFound = 'revocation_not_found';
+    case RevocationListFull = 'revocation_list_full';
     case InternalError = 'internal_error';
     case Unknown = 'unknown';
 }

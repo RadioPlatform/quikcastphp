@@ -8,8 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `bans()` resource for `GET/POST/DELETE /api/bans` (list, create with ttl, reason and kick, lift).
+- `revocations()` resource for `GET/POST/DELETE /api/revocations` (single signed-link revocation).
+- `hls()->listeners($stream)` for directory HLS sessions (`GET /api/hls/{stream}/listeners`).
+- Directory-stream fields on `StreamInfo` (`source`, `playlistCount`, `activeListeners`,
+  `activeSessions`, request counters), the `empty` HLS state, and `Stats::$activeHlsListeners`.
+- `BanNotFound`, `BanListFull`, `RevocationNotFound` and `RevocationListFull` exceptions.
+
+### Changed
+- **Breaking:** replaced Guzzle with [ElliePHP HttpClient](https://github.com/ElliePHP/HttpClient).
+  Custom clients passed to `QuikcastClient` must now implement Symfony's
+  `HttpClientInterface` instead of Guzzle's `ClientInterface`.
+- **Breaking:** requires PHP `^8.4` (was `^8.2`).
+- Updated dev tooling: PHPUnit 13, Pint 1.32, PHPStan 2.3.
+
+### Added
 - Initial client for the Quikcast native management API (server, stats, mounts,
-  sources, listeners, HLS, relays) over Guzzle with Bearer authentication.
+  sources, listeners, HLS, relays) over HTTP with Bearer authentication.
 - Source metadata operation (`mode=updinfo`) via HTTP Basic auth on the
   streaming listener.
 - Lightweight health probes (`/health/live`, `/health/ready`).

@@ -57,6 +57,7 @@ final readonly class Stats extends Dto
         public int $hlsPartialResponsesTotal = 0,
         public int $hlsNotModifiedResponsesTotal = 0,
         public int $hlsRangeRejectionsTotal = 0,
+        public int $activeHlsListeners = 0,
     ) {}
 
     /**
@@ -111,6 +112,7 @@ final readonly class Stats extends Dto
             self::int($data, 'hls_partial_responses_total'),
             self::int($data, 'hls_not_modified_responses_total'),
             self::int($data, 'hls_range_rejections_total'),
+            self::int($data, 'active_hls_listeners'),
         );
     }
 }
